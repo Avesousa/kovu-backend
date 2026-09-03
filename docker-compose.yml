@@ -1,0 +1,34 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: kovu
+      MYSQL_USER: kovu
+      MYSQL_PASSWORD: kovu
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - kovu_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      APP_PORT: 8080
+      DB_URL: "jdbc:mysql://mysql:3306/kovu?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+      DB_USER: kovu
+      DB_PASSWORD: kovu
+      DB_POOL_SIZE: 8
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  kovu_mysql_data:
