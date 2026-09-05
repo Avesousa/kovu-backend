@@ -18,11 +18,20 @@ import java.util.concurrent.TimeUnit;
  * reparten con una {@link BlockingQueue}. Si no hay ninguna libre, {@link
  * #borrow()} espera hasta 5 segundos y después falla explícitamente en vez
  * de bloquear para siempre — mejor un error claro que un servidor colgado.
+ *
+ * <p>Al arrancar, reintenta la primera conexión con backoff (ver {@link
+ * #ARRANQUE_MAX_INTENTOS}): en Docker Compose, {@code depends_on:
+ * condition: service_healthy} garantiza que el healthcheck de MySQL ya
+ * pasó, pero no que la red entre contenedores esté 100% propagada en ese
+ * mismo instante — sin este reintento, el contenedor de la app puede morir
+ * por una carrera de unos pocos milisegundos justo al arrancar.
  */
 public final class ConnectionPool implements AutoCloseable {
 
     private static final System.Logger LOG = System.getLogger(ConnectionPool.class.getName());
     private static final long TIMEOUT_SEGUNDOS = 5;
+    private static final int ARRANQUE_MAX_INTENTOS = 10;
+    private static final long ARRANQUE_ESPERA_MS = 1000;
 
     private final BlockingQueue<Connection> disponibles;
     private final String url;
@@ -34,10 +43,30 @@ public final class ConnectionPool implements AutoCloseable {
         this.user = user;
         this.password = password;
         this.disponibles = new LinkedBlockingQueue<>(size);
-        for (int i = 0; i < size; i++) {
+        disponibles.add(crearConexionConReintentos());
+        for (int i = 1; i < size; i++) {
             disponibles.add(crearConexion());
         }
         LOG.log(Level.INFO, "Pool de conexiones inicializado con " + size + " conexiones");
+    }
+
+    /** Solo se usa para la primera conexión al arrancar; ver el porqué en la doc de la clase. */
+    private Connection crearConexionConReintentos() {
+        for (int intento = 1; intento <= ARRANQUE_MAX_INTENTOS; intento++) {
+            try {
+                return DriverManager.getConnection(url, user, password);
+            } catch (SQLException e) {
+                if (intento == ARRANQUE_MAX_INTENTOS) {
+                    throw new IllegalStateException(
+                            "No se pudo conectar a la base de datos en " + url +
+                                    " tras " + ARRANQUE_MAX_INTENTOS + " intentos", e);
+                }
+                LOG.log(Level.WARNING, "Intento " + intento + "/" + ARRANQUE_MAX_INTENTOS +
+                        " de conexión a " + url + " falló, reintentando: " + e.getMessage());
+                dormir(ARRANQUE_ESPERA_MS);
+            }
+        }
+        throw new IllegalStateException("No se alcanzó nunca a conectar a " + url); // inalcanzable
     }
 
     private Connection crearConexion() {
@@ -45,6 +74,15 @@ public final class ConnectionPool implements AutoCloseable {
             return DriverManager.getConnection(url, user, password);
         } catch (SQLException e) {
             throw new IllegalStateException("No se pudo conectar a la base de datos en " + url, e);
+        }
+    }
+
+    private static void dormir(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrumpido esperando para reintentar la conexión", e);
         }
     }
 

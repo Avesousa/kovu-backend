@@ -121,7 +121,7 @@ Los tests contra MySQL real (`@Tag("integration")`, ej.
 
 ```bash
 docker compose up -d mysql
-mvn test -Dgroups=integration -Dtest=JdbcProductoRepositoryTest
+mvn test -DexcludedGroups= -Dgroups=integration -Dtest=JdbcProductoRepositoryTest
 ```
 
 ### Cobertura

@@ -33,6 +33,11 @@
     <maven-surefire-plugin.version>3.5.6</maven-surefire-plugin.version>
     <maven-shade-plugin.version>3.6.2</maven-shade-plugin.version>
     <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
+
+    <!-- Por defecto, "mvn test" NO corre los tests marcados @Tag("integration")
+         (necesitan MySQL levantado). Para correrlos: `-DexcludedGroups=
+         -Dgroups=integration` (ver README). -->
+    <excludedGroups>integration</excludedGroups>
   </properties>
 
   <dependencies>
@@ -81,9 +86,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${maven-surefire-plugin.version}</version>
         <configuration>
-          <!-- Los tests de integración (@Tag("integration"), requieren MySQL vivo)
-               no corren en el ciclo normal `mvn test`. Ver README para correrlos. -->
-          <excludedGroups>integration</excludedGroups>
+          <excludedGroups>${excludedGroups}</excludedGroups>
         </configuration>
       </plugin>
 
