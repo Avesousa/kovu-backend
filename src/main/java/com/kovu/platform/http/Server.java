@@ -23,10 +23,8 @@ public final class Server {
     private static final System.Logger LOG = System.getLogger(Server.class.getName());
 
     private final HttpServer httpServer;
-    private final int port;
 
     public Server(int port, Router router) throws IOException {
-        this.port = port;
         this.httpServer = HttpServer.create(new InetSocketAddress(port), 0);
         this.httpServer.createContext("/", router);
         this.httpServer.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
@@ -34,14 +32,20 @@ public final class Server {
 
     public void start() {
         httpServer.start();
-        LOG.log(Level.INFO, "Servidor escuchando en el puerto " + port);
+        LOG.log(Level.INFO, "Servidor escuchando en el puerto " + port());
     }
 
     public void stop(int delaySeconds) {
         httpServer.stop(delaySeconds);
     }
 
+    /**
+     * Puerto realmente asignado por el sistema operativo. Si se construyó
+     * con puerto 0 ("elegí uno libre"), este es el único lugar donde se
+     * puede conocer cuál fue — el campo que se le pasó al constructor ya no
+     * sirve para eso.
+     */
     public int port() {
-        return port;
+        return httpServer.getAddress().getPort();
     }
 }
