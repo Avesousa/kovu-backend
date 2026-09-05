@@ -19,6 +19,7 @@ import java.util.Map;
  * validación "sintáctica"), delega la lógica de negocio al service, y
  * mapea el resultado a un DTO de respuesta. No hay SQL ni reglas de
  * negocio acá.
+ * Productos no tendra inventario.
  */
 public final class ProductoController {
 
