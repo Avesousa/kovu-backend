@@ -20,6 +20,7 @@ import java.util.Map;
  * mapea el resultado a un DTO de respuesta. No hay SQL ni reglas de
  * negocio acá.
  * Productos no tendra inventario.
+ * Productos será solo una entidad
  */
 public final class ProductoController {
 
