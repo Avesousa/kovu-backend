@@ -12,15 +12,7 @@ public class MovimientoTest {
     void movimiento_sinId_debeRetornarError() {
 
         assertThrows(IllegalArgumentException.class, () ->
-                new Movimiento(
-                        null,
-                        null,
-                        null,
-                        null,
-                        10,
-                        "ENTRADA",
-                        Instant.now().toString()
-                )
+                new Movimiento(null, null, null, null, 10, "ENTRADA", Instant.now().toString())
         );
     }
 
