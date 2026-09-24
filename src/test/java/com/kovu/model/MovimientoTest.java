@@ -7,12 +7,13 @@ import java.time.Instant;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MovimientoTest {
-
-    @Test
+        
+@Test
     void movimiento_sinId_debeRetornarError() {
 
-        assertThrows(IllegalArgumentException.class, () ->
-                new Movimiento(null, null, null, null, 10, "ENTRADA", Instant.now().toString())
+        assertThrows(IllegalArgumentException.class, () -> 
+                new Movimiento(null, null, null, null, 10, "ENTRADA", Instant.now().toString()),
+                "Se espera que retorne un error al enviar como ID un null"
         );
     }
 
@@ -20,15 +21,8 @@ public class MovimientoTest {
     void movimiento_sinProducto_debeRetornarError() {
 
         assertThrows(IllegalArgumentException.class, () ->
-                new Movimiento(
-                        1L,
-                        null,
-                        null,
-                        null,
-                        10,
-                        "ENTRADA",
-                        Instant.now().toString()
-                )
+                new Movimiento(1L,null,null,null,10,"ENTRADA",Instant.now().toString()),
+                "Se espera que retorne un error al enviar como producto un null"
         );
     }
 
@@ -36,15 +30,8 @@ public class MovimientoTest {
     void movimiento_sinCantidad_debeRetornarError() {
 
         assertThrows(IllegalArgumentException.class, () ->
-                new Movimiento(
-                        1L,
-                        null,
-                        null,
-                        null,
-                        null,
-                        "ENTRADA",
-                        Instant.now().toString()
-                )
+                new Movimiento(1L,null,null,null,null,"ENTRADA",Instant.now().toString()),
+                "Se espera que retorne un error al enviar como cantidad un null"
         );
     }
 
@@ -52,15 +39,8 @@ public class MovimientoTest {
     void movimiento_conCantidadCero_debeRetornarError() {
 
         assertThrows(IllegalArgumentException.class, () ->
-                new Movimiento(
-                        1L,
-                        null,
-                        null,
-                        null,
-                        0,
-                        "ENTRADA",
-                        Instant.now().toString()
-                )
+                new Movimiento(1L,null,null,null,0,"ENTRADA",Instant.now().toString()),
+                "Se espera que retorne un error al enviar como cantidad cero"
         );
     }
 
@@ -68,15 +48,8 @@ public class MovimientoTest {
     void movimiento_conCantidadNegativa_debeRetornarError() {
 
         assertThrows(IllegalArgumentException.class, () ->
-                new Movimiento(
-                        1L,
-                        null,
-                        null,
-                        null,
-                        -10,
-                        "ENTRADA",
-                        Instant.now().toString()
-                )
+                new Movimiento(1L,null,null,null,-10,"ENTRADA",Instant.now().toString()),
+                "Se espera que retorne un error al enviar como cantidad un número negativo"
         );
     }
 
@@ -84,15 +57,8 @@ public class MovimientoTest {
     void movimiento_sinTipoMovimiento_debeRetornarError() {
 
         assertThrows(IllegalArgumentException.class, () ->
-                new Movimiento(
-                        1L,
-                        null,
-                        null,
-                        null,
-                        10,
-                        null,
-                        Instant.now().toString()
-                )
+                new Movimiento(1L,null,null,null,10,null,Instant.now().toString()),
+                "Se espera que retorne un error al enviar como tipo de movimiento un null"
         );
     }
 
@@ -100,15 +66,8 @@ public class MovimientoTest {
     void movimiento_conTipoMovimientoVacio_debeRetornarError() {
 
         assertThrows(IllegalArgumentException.class, () ->
-                new Movimiento(
-                        1L,
-                        null,
-                        null,
-                        null,
-                        10,
-                        "",
-                        Instant.now().toString()
-                )
+                new Movimiento(1L,null,null,null,10,"",Instant.now().toString()),
+                "Se espera que retorne un error al enviar como tipo de movimiento un texto vacío"
         );
     }
 
@@ -116,15 +75,8 @@ public class MovimientoTest {
     void movimiento_sinFecha_debeRetornarError() {
 
         assertThrows(IllegalArgumentException.class, () ->
-                new Movimiento(
-                        1L,
-                        null,
-                        null,
-                        null,
-                        10,
-                        "ENTRADA",
-                        null
-                )
+                new Movimiento(1L,null,null,null,10,"ENTRADA",null),
+                "Se espera que retorne un error al enviar como fecha un null"
         );
     }
 
@@ -132,15 +84,8 @@ public class MovimientoTest {
     void movimiento_conFechaVacia_debeRetornarError() {
 
         assertThrows(IllegalArgumentException.class, () ->
-                new Movimiento(
-                        1L,
-                        null,
-                        null,
-                        null,
-                        10,
-                        "ENTRADA",
-                        ""
-                )
+                new Movimiento(1L,null,null,null,10,"ENTRADA","" ),
+                "Se espera que retorne un error al enviar como fecha un texto vacío"
         );
     }
 }
